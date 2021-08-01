@@ -1,6 +1,6 @@
 import os
-from subprocess import call
 import glob
+import subprocess
 
 import pandas as pd
 import numpy as np
@@ -91,11 +91,24 @@ res = lfi.mel_to_audio(mel, sr=sample_rate, n_fft=2048, hop_length=1024)
 write("./data/reversed/file=%s n_fft=%s hop_length=%s sr=%s.wav"%(filename, n_fft, hop_length, sample_rate), sample_rate, res.astype(np.float32))
 
 #%% play sound file
+import subprocess
+from subprocess import Popen
 
-def play(wav_file):
-    call(['aplay', wav_file])
+def play(sound_file):
+    extension = sound_file.split('.')[-1]
+    if extension == 'wav':
+        Popen(['aplay', sound_file])
+    if extension == 'flac':
+        flac = Popen(('flac', '-c', '-d', sound_file), stdout=subprocess.PIPE)
+        out = subprocess.check_output(('aplay'), stdin=flac.stdout)
+        flac.wait()
+    else:
+        print('unhandled filetype; extension is: ', extension)
 
 #%% playback
+
+play('./data/LibriSpeech/dev-clean/1272/128104/1272-128104-0000.flac')
+
 flipped_sample = "./data/reversed/file=contra_00 n_fft=2048 hop_length=1024 sr=48000.wav"
 play(flipped_sample)
 
