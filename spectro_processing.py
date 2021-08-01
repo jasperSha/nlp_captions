@@ -47,6 +47,9 @@ def chop(wav_file, n_fft, hop_length, start_end=None):
     sample_rate = wav_file['sr']
     captions = wav_file['caption_file']
 
+    #some regex malarkey to get just the filename
+    filename = captions.split('/')[-1].split('.')[0]
+
     start = start_end[0] * sample_rate
     end = start_end[1] * sample_rate
 
@@ -68,7 +71,7 @@ def chop(wav_file, n_fft, hop_length, start_end=None):
     librosa.display.specshow(log_mel, sr=sample_rate, hop_length=hop_length, x_axis='time', y_axis='mel')
     print("generated using n_fft:", n_fft, " and hop_length: ", hop_length)
     plt.show()
-    return stft, mel, log_mel
+    return stft, mel, log_mel, sample_rate, filename
 
 
 #%% generate wav_files
@@ -76,22 +79,23 @@ wav_files = generate_wav_files()
 
 #%% generate mel spectrogram
 first_vid = wav_files.iloc[0]
+
 n_fft = 2048
-hop_length = 512
-stft, mel, log_mel = chop(first_vid, n_fft=n_fft, hop_length=hop_length, start_end=(90, 100))
+hop_length = 1024
+stft, mel, log_mel, sample_rate, filename = chop(first_vid, n_fft=n_fft, hop_length=hop_length, start_end=(90, 100))
 
 
 #%% convert mel spectrogram back to audio using librosa
-sr = 48000
-res = lfi.mel_to_audio(mel, sr=sr, n_fft=2048, hop_length=512)
+res = lfi.mel_to_audio(mel, sr=sample_rate, n_fft=2048, hop_length=1024)
 
-
-write("test2.wav", sr, res.astype(np.float32))
+write("./data/reversed/file=%s n_fft=%s hop_length=%s sr=%s.wav"%(filename, n_fft, hop_length, sample_rate), sample_rate, res.astype(np.float32))
 
 #%% play sound file
 
 def play(wav_file):
     call(['aplay', wav_file])
 
-#%%
-play('test2.wav')
+#%% playback
+flipped_sample = "./data/reversed/file=contra_00 n_fft=2048 hop_length=1024 sr=48000.wav"
+play(flipped_sample)
+
