@@ -18,6 +18,8 @@ Right now trying to determine how to separate the wav files and captions. Do I f
 
 An easier way is to use datasets that are already specifically split on words, and also provide the extra benefit of simulating environmental noise as "variance" to help prevent overfitting.
 
+8/1
+Solution to word splitting issue: apply sequence modeling using Connectionist Temporal Classification (CTC), which, when fed a sequence of tokens from an RNN(effective for its contextual distribution, but any NN that produces fixed-size input slice -> distribution over output classes/tokens will work), can compute a probability distribution of tokens and then collapse them. The LibriSpeech dataset works well with this as it's already split into digestible chunks of waveforms + captions, although Youtube datasets will work as well.
 
 
 
