@@ -1,4 +1,6 @@
 import subprocess
+
+
 def play(sound_file):
     '''
     playback of flac/wav sound files
@@ -8,7 +10,7 @@ def play(sound_file):
     extension = sound_file.split('.')[-1]
     if extension == 'wav':
         subprocess.Popen(['aplay', sound_file])
-    if extension == 'flac':
+    elif extension == 'flac':
         flac = subprocess.Popen(('flac', '-c', '-d', sound_file), stdout=subprocess.PIPE)
         out = subprocess.check_output(('aplay'), stdin=flac.stdout)
         flac.wait()
